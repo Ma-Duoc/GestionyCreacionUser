@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.GestionyCreacionUser.GestionyCreacionUser.Model.Paciente;
+import com.GestionyCreacionUser.GestionyCreacionUser.Model.Rol;
 import com.GestionyCreacionUser.GestionyCreacionUser.Service.PacienteService;
 
 @RestController
@@ -41,8 +42,7 @@ public class PacienteController {
             paciente.getNombre().isEmpty() ||
             paciente.getCorreo().isEmpty() ||
             paciente.getFono().isEmpty() ||
-            paciente.getHistorialMedico().isEmpty() ||
-            paciente.getRol_id() == null) {
+            paciente.getHistorialMedico().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Todos los campos son obligatorios.");
         }
 
@@ -50,6 +50,11 @@ public class PacienteController {
         if (pacienteExistente != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El paciente con rut " + paciente.getRut() + " ya existe.");
         }
+
+        // Asignar rol_id = 1 directamente
+        Rol rolPorDefecto = new Rol();
+        rolPorDefecto.setRol_id(1);
+        paciente.setRol_id(rolPorDefecto);
 
         String mensaje = pacienteService.guardarPaciente(paciente);
         return ResponseEntity.status(HttpStatus.CREATED).body(mensaje);
@@ -67,21 +72,26 @@ public class PacienteController {
                 paciente.getNombre().isEmpty() ||
                 paciente.getCorreo().isEmpty() ||
                 paciente.getFono().isEmpty() ||
-                paciente.getHistorialMedico().isEmpty() ||
-                paciente.getRol_id() == null) {
+                paciente.getHistorialMedico().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Datos incompletos de algún paciente.");
             }
 
-       Paciente pacienteExistente = pacienteService.buscarPorRut(paciente.getRut());
-        if (pacienteExistente != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Ya existe un paciente con el RUT " + paciente.getRut());
+            Paciente pacienteExistente = pacienteService.buscarPorRut(paciente.getRut());
+            if (pacienteExistente != null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Ya existe un paciente con el RUT " + paciente.getRut());
             }
+
+            // Asignar rol_id = 1 a cada paciente
+            Rol rolPorDefecto = new Rol();
+            rolPorDefecto.setRol_id(1);
+            paciente.setRol_id(rolPorDefecto);
         }
 
         String mensaje = pacienteService.guardarPacientes(pacientes);
         return ResponseEntity.status(HttpStatus.CREATED).body(mensaje);
     }
+
 
     @PutMapping("/actualizar")
     public ResponseEntity<String> actualizarPaciente(@RequestBody Paciente paciente) {
@@ -89,14 +99,24 @@ public class PacienteController {
         if (pacienteExistente == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente con RUT " + paciente.getRut() + " no encontrado.");
         }
+
+        if (paciente.getCorreo().isEmpty() ||
+            paciente.getFono().isEmpty() ||
+            paciente.getHistorialMedico().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Correo, fono e historial médico son obligatorios.");
+        }
+
+        // Solo se actualizan campos permitidos
+        pacienteExistente.setNombre(paciente.getNombre());
         pacienteExistente.setCorreo(paciente.getCorreo());
         pacienteExistente.setFono(paciente.getFono());
         pacienteExistente.setHistorialMedico(paciente.getHistorialMedico());
-        pacienteExistente.setRol_id(paciente.getRol_id());
-        
+
+
         String mensaje = pacienteService.actualizarPaciente(pacienteExistente);
-        return ResponseEntity.ok(mensaje);  // 200 OK con el mensaje de éxito
+        return ResponseEntity.ok(mensaje);
     }
+
 
     @DeleteMapping("/eliminar/{rut}")
     public ResponseEntity<String> eliminarPaciente(@PathVariable String rut) {

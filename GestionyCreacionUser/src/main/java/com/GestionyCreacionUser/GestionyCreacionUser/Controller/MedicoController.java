@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.GestionyCreacionUser.GestionyCreacionUser.Model.Medico;
+import com.GestionyCreacionUser.GestionyCreacionUser.Model.Rol;
 import com.GestionyCreacionUser.GestionyCreacionUser.Service.MedicoService;
 
 @RestController
@@ -32,16 +33,19 @@ public class MedicoController {
             medico.getNombre().isEmpty() ||
             medico.getCorreo().isEmpty() ||
             medico.getFono().isEmpty() ||
-            medico.getEspecialidad().isEmpty() ||
-            medico.getRol_id()==null) {
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Todos los campos del médico son obligatorios.");
+            medico.getEspecialidad().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Todos los campos son obligatorios.");
         }
 
         Medico medicoExistente = medicoService.buscarPorRut(medico.getRut());
         if (medicoExistente != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El médico con RUT " + medico.getRut() + " ya existe.");
         }
+
+        // Asignar rol_id = 2 directamente (ejemplo)
+        Rol rolPorDefecto = new Rol();
+        rolPorDefecto.setRol_id(2);
+        medico.setRol_id(rolPorDefecto);
 
         String mensaje = medicoService.guardarMedico(medico);
         return ResponseEntity.status(HttpStatus.CREATED).body(mensaje);
@@ -58,10 +62,8 @@ public class MedicoController {
                 medico.getNombre().isEmpty() ||
                 medico.getCorreo().isEmpty() ||
                 medico.getFono().isEmpty() ||
-                medico.getEspecialidad().isEmpty() ||
-                medico.getRol_id() == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Datos incompletos de algún médico en la lista.");
+                medico.getEspecialidad().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Datos incompletos de algún médico.");
             }
 
             Medico medicoExistente = medicoService.buscarPorRut(medico.getRut());
@@ -69,6 +71,11 @@ public class MedicoController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Ya existe un médico con el RUT " + medico.getRut());
             }
+
+            // Asignar rol_id = 2 a cada médico
+            Rol rolPorDefecto = new Rol();
+            rolPorDefecto.setRol_id(2);
+            medico.setRol_id(rolPorDefecto);
         }
 
         String mensaje = medicoService.guardarMedicos(medicos);
@@ -83,10 +90,19 @@ public class MedicoController {
                     .body("Médico con RUT " + medico.getRut() + " no encontrado.");
         }
 
+        if (medico.getCorreo().isEmpty() ||
+            medico.getFono().isEmpty() ||
+            medico.getEspecialidad().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Correo, fono y especialidad son obligatorios.");
+        }
+
+        // Solo actualizar campos permitidos
+        medicoExistente.setNombre(medico.getNombre());
         medicoExistente.setCorreo(medico.getCorreo());
         medicoExistente.setFono(medico.getFono());
         medicoExistente.setEspecialidad(medico.getEspecialidad());
-        medicoExistente.setRol_id(medico.getRol_id());
+
 
         String mensaje = medicoService.actualizarMedico(medicoExistente);
         return ResponseEntity.ok(mensaje);
@@ -124,4 +140,5 @@ public class MedicoController {
         return ResponseEntity.ok(medicos);
     }
 }
+
 

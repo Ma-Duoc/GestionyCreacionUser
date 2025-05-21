@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.GestionyCreacionUser.GestionyCreacionUser.Model.Administrador;
+import com.GestionyCreacionUser.GestionyCreacionUser.Model.Rol;
 import com.GestionyCreacionUser.GestionyCreacionUser.Service.AdministradorService;
 
 @RestController
@@ -31,12 +32,10 @@ public class AdministradorController {
         if (administrador.getRut().isEmpty() ||
             administrador.getNombre().isEmpty() ||
             administrador.getCorreo().isEmpty() ||
-            administrador.getFono() == null ||
-            administrador.getArea().isEmpty() ||
-            administrador.getRol_id() == null) {
-
+            administrador.getFono().isEmpty() ||
+            administrador.getArea().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Todos los campos del administrador son obligatorios.");
+                    .body("Todos los campos son obligatorios.");
         }
 
         Administrador administradorExistente = administradorService.buscarPorRut(administrador.getRut());
@@ -44,6 +43,11 @@ public class AdministradorController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("El administrador con RUT " + administrador.getRut() + " ya existe.");
         }
+
+        // Asignar rol_id = 1 por defecto
+        Rol rolPorDefecto = new Rol();
+        rolPorDefecto.setRol_id(3);
+        administrador.setRol_id(rolPorDefecto);
 
         String mensaje = administradorService.guardarAdministrador(administrador);
         return ResponseEntity.status(HttpStatus.CREATED).body(mensaje);
@@ -59,12 +63,10 @@ public class AdministradorController {
             if (administrador.getRut().isEmpty() ||
                 administrador.getNombre().isEmpty() ||
                 administrador.getCorreo().isEmpty() ||
-                administrador.getFono()==null ||
-                administrador.getArea().isEmpty() ||
-                administrador.getRol_id() == null) {
-
+                administrador.getFono().isEmpty() ||
+                administrador.getArea().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Datos incompletos de algún administrador en la lista.");
+                        .body("Datos incompletos de algún administrador.");
             }
 
             Administrador administradorExistente = administradorService.buscarPorRut(administrador.getRut());
@@ -72,6 +74,11 @@ public class AdministradorController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Ya existe un administrador con el RUT " + administrador.getRut());
             }
+
+            // Asignar rol_id = 1 por defecto
+            Rol rolPorDefecto = new Rol();
+            rolPorDefecto.setRol_id(3);
+            administrador.setRol_id(rolPorDefecto);
         }
 
         String mensaje = administradorService.guardarAdministradores(administradores);
@@ -86,10 +93,20 @@ public class AdministradorController {
                     .body("Administrador con RUT " + administrador.getRut() + " no encontrado.");
         }
 
+        if (administrador.getCorreo().isEmpty() ||
+            administrador.getFono().isEmpty() ||
+            administrador.getArea().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Correo, fono y área son obligatorios.");
+        }
+
+        // Solo actualizamos campos permitidos
+        administradorExistente.setNombre(administrador.getNombre());
         administradorExistente.setCorreo(administrador.getCorreo());
         administradorExistente.setFono(administrador.getFono());
         administradorExistente.setArea(administrador.getArea());
-        administradorExistente.setRol_id(administrador.getRol_id());
+
+
 
         String mensaje = administradorService.actualizarAdministrador(administradorExistente);
         return ResponseEntity.ok(mensaje);
@@ -128,4 +145,5 @@ public class AdministradorController {
         return ResponseEntity.ok(administradores);
     }
 }
+
 

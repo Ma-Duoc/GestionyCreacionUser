@@ -18,7 +18,7 @@ public class Paciente {
     @Column(unique = true, length = 13)
     private String rut;  
 
-    @Column(nullable = false, length = 50, unique = true)
+    @Column(nullable = false, length = 50,unique = false)
     private String nombre;  
 
     @Column(nullable = false)
