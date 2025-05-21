@@ -127,29 +127,29 @@ public class PacienteController {
         }
 
         String mensaje = pacienteService.eliminarPaciente(rut);
-        return ResponseEntity.ok(mensaje);  // 200 OK con el mensaje de éxito
+        return ResponseEntity.ok(mensaje);  
     }
 
     @GetMapping("/buscar/rut/{rut}")
     public ResponseEntity<Paciente> buscarPorRut(@PathVariable String rut) {
         Paciente paciente = pacienteService.buscarPorRut(rut);
         if (paciente == null) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  // 404 Not Found si no se encuentra el paciente
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  
         }
         
-        return ResponseEntity.ok(paciente);  // 200 OK con los detalles del paciente
+        return ResponseEntity.ok(paciente);  
     }
 
     @GetMapping("/buscar/nombre/{nombre}")
     public ResponseEntity<List<Paciente>> buscarPorNombre(@PathVariable String nombre) {
         List<Paciente> pacientes = pacienteService.buscarPorNombre(nombre);
-        return ResponseEntity.ok(pacientes);  // 200 OK con la lista de pacientes
+        return ResponseEntity.ok(pacientes);  
     }
 
     @GetMapping("/buscar/nombre-parcial/{nombre}")
     public ResponseEntity<List<Paciente>> buscarPorNombreParcial(@PathVariable String nombre) {
         List<Paciente> pacientes = pacienteService.buscarPorNombreParcial(nombre);
-        return ResponseEntity.ok(pacientes);  // 200 OK con la lista de pacientes que coinciden parcialmente
+        return ResponseEntity.ok(pacientes);  
     }
 
 
