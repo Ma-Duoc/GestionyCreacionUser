@@ -51,7 +51,7 @@ public class PacienteController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El paciente con rut " + paciente.getRut() + " ya existe.");
         }
 
-        // Asignar rol_id = 1 directamente
+
         Rol rolPorDefecto = new Rol();
         rolPorDefecto.setRol_id(1);
         paciente.setRol_id(rolPorDefecto);
@@ -82,7 +82,7 @@ public class PacienteController {
                     .body("Ya existe un paciente con el RUT " + paciente.getRut());
             }
 
-            // Asignar rol_id = 1 a cada paciente
+    
             Rol rolPorDefecto = new Rol();
             rolPorDefecto.setRol_id(1);
             paciente.setRol_id(rolPorDefecto);
@@ -100,13 +100,14 @@ public class PacienteController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente con RUT " + paciente.getRut() + " no encontrado.");
         }
 
-        if (paciente.getCorreo().isEmpty() ||
+        if (paciente.getNombre().isEmpty() ||
+            paciente.getCorreo().isEmpty() ||
             paciente.getFono().isEmpty() ||
             paciente.getHistorialMedico().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Correo, fono e historial médico son obligatorios.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Correo, fono, nombre e historial médico son obligatorios.");
         }
 
-        // Solo se actualizan campos permitidos
+
         pacienteExistente.setNombre(paciente.getNombre());
         pacienteExistente.setCorreo(paciente.getCorreo());
         pacienteExistente.setFono(paciente.getFono());

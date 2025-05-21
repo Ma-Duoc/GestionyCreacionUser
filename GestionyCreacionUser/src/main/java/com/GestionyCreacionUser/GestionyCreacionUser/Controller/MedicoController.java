@@ -90,7 +90,8 @@ public class MedicoController {
                     .body("Médico con RUT " + medico.getRut() + " no encontrado.");
         }
 
-        if (medico.getCorreo().isEmpty() ||
+        if (medico.getNombre().isEmpty() ||
+            medico.getCorreo().isEmpty() ||
             medico.getFono().isEmpty() ||
             medico.getEspecialidad().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

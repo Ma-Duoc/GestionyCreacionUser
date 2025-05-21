@@ -93,7 +93,8 @@ public class AdministradorController {
                     .body("Administrador con RUT " + administrador.getRut() + " no encontrado.");
         }
 
-        if (administrador.getCorreo().isEmpty() ||
+        if (administrador.getNombre().isEmpty() ||
+            administrador.getCorreo().isEmpty() ||
             administrador.getFono().isEmpty() ||
             administrador.getArea().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
