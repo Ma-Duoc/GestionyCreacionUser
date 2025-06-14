@@ -27,7 +27,7 @@ public class Paciente {
     @Column(nullable = false, length = 9)
     private String fono;  
 
-    @Column(nullable = false, columnDefinition = "CLOB")  
+    @Column(nullable = false, columnDefinition = "TEXT")  
     private String historialMedico;
 
     @ManyToOne
