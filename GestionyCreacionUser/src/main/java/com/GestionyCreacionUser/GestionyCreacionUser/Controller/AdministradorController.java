@@ -11,40 +11,65 @@ import com.GestionyCreacionUser.GestionyCreacionUser.Model.Administrador;
 import com.GestionyCreacionUser.GestionyCreacionUser.Model.Rol;
 import com.GestionyCreacionUser.GestionyCreacionUser.Service.AdministradorService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.Parameter;
+
 @RestController
 @RequestMapping("/administradores")
+@Tag(name = "Administradores", description = "Operaciones relacionadas con los administradores")
 public class AdministradorController {
 
     @Autowired
     private AdministradorService administradorService;
 
     @GetMapping("/listar")
+    @Operation(summary = "Obtener todos los administradores", description = "Retorna una lista con todos los administradores registrados en el sistema.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Consulta exitosa",
+            content = @Content(mediaType = "application/json",
+                array = @ArraySchema(schema = @Schema(implementation = Administrador.class)))),
+        @ApiResponse(responseCode = "204", description = "No hay administradores registrados", content = @Content)
+    })
     public ResponseEntity<List<Administrador>> listarAdministradores() {
         List<Administrador> administradores = administradorService.listarAdministradores();
         if (administradores.isEmpty()) {
-            return ResponseEntity.noContent().build(); // 204 No Content
+            return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(administradores);
     }
 
     @PostMapping("/guardar")
-    public ResponseEntity<String> guardarAdministrador(@RequestBody Administrador administrador) {
-        if (administrador.getRut().isEmpty() ||
+    @Operation(summary = "Registrar nuevo administrador", description = "Registra un nuevo administrador en el sistema. Se deben enviar todos los datos requeridos.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Administrador creado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Campos requeridos faltantes o RUT repetido")
+    })
+    public ResponseEntity<String> guardarAdministrador(
+        @RequestBody(
+            description = "Administrador a crear",
+            required = true,
+            content = @Content(schema = @Schema(implementation = Administrador.class))
+        )
+        @org.springframework.web.bind.annotation.RequestBody Administrador administrador) {
+
+        if (administrador.getRutAdministrador().isEmpty() ||
             administrador.getNombre().isEmpty() ||
             administrador.getCorreo().isEmpty() ||
             administrador.getFono().isEmpty() ||
             administrador.getArea().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Todos los campos son obligatorios.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Todos los campos son obligatorios.");
         }
 
-        Administrador administradorExistente = administradorService.buscarPorRut(administrador.getRut());
+        Administrador administradorExistente = administradorService.buscarPorRut(administrador.getRutAdministrador());
         if (administradorExistente != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("El administrador con RUT " + administrador.getRut() + " ya existe.");
+                .body("El administrador con RUT " + administrador.getRutAdministrador() + " ya existe.");
         }
 
-        // Asignar rol_id = 1 por defecto
         Rol rolPorDefecto = new Rol();
         rolPorDefecto.setRol_id(3);
         administrador.setRol_id(rolPorDefecto);
@@ -54,13 +79,25 @@ public class AdministradorController {
     }
 
     @PostMapping("/guardar-multiple")
-    public ResponseEntity<String> guardarAdministradores(@RequestBody List<Administrador> administradores) {
+    @Operation(summary = "Registrar múltiples administradores", description = "Permite registrar múltiples administradores en una sola solicitud.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Lista de administradores creada correctamente"),
+        @ApiResponse(responseCode = "400", description = "Algún administrador tiene datos inválidos o RUT duplicado")
+    })
+    public ResponseEntity<String> guardarAdministradores(
+        @RequestBody(
+            description = "Lista de administradores a crear",
+            required = true,
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = Administrador.class)))
+        )
+        @org.springframework.web.bind.annotation.RequestBody List<Administrador> administradores) {
+
         if (administradores.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La lista de administradores está vacía.");
         }
 
         for (Administrador administrador : administradores) {
-            if (administrador.getRut().isEmpty() ||
+            if (administrador.getRutAdministrador().isEmpty() ||
                 administrador.getNombre().isEmpty() ||
                 administrador.getCorreo().isEmpty() ||
                 administrador.getFono().isEmpty() ||
@@ -69,13 +106,12 @@ public class AdministradorController {
                         .body("Datos incompletos de algún administrador.");
             }
 
-            Administrador administradorExistente = administradorService.buscarPorRut(administrador.getRut());
+            Administrador administradorExistente = administradorService.buscarPorRut(administrador.getRutAdministrador());
             if (administradorExistente != null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Ya existe un administrador con el RUT " + administrador.getRut());
+                        .body("Ya existe un administrador con el RUT " + administrador.getRutAdministrador());
             }
 
-            // Asignar rol_id = 1 por defecto
             Rol rolPorDefecto = new Rol();
             rolPorDefecto.setRol_id(3);
             administrador.setRol_id(rolPorDefecto);
@@ -86,11 +122,24 @@ public class AdministradorController {
     }
 
     @PutMapping("/actualizar")
-    public ResponseEntity<String> actualizarAdministrador(@RequestBody Administrador administrador) {
-        Administrador administradorExistente = administradorService.buscarPorRut(administrador.getRut());
+    @Operation(summary = "Actualizar administrador", description = "Actualiza los datos de un administrador existente.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Administrador actualizado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos o faltantes"),
+        @ApiResponse(responseCode = "404", description = "Administrador no encontrado")
+    })
+    public ResponseEntity<String> actualizarAdministrador(
+        @RequestBody(
+            description = "Administrador con datos actualizados",
+            required = true,
+            content = @Content(schema = @Schema(implementation = Administrador.class))
+        )
+        @org.springframework.web.bind.annotation.RequestBody Administrador administrador) {
+
+        Administrador administradorExistente = administradorService.buscarPorRut(administrador.getRutAdministrador());
         if (administradorExistente == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Administrador con RUT " + administrador.getRut() + " no encontrado.");
+                    .body("Administrador con RUT " + administrador.getRutAdministrador() + " no encontrado.");
         }
 
         if (administrador.getNombre().isEmpty() ||
@@ -101,20 +150,25 @@ public class AdministradorController {
                     .body("Correo, fono y área son obligatorios.");
         }
 
-        // Solo actualizamos campos permitidos
         administradorExistente.setNombre(administrador.getNombre());
         administradorExistente.setCorreo(administrador.getCorreo());
         administradorExistente.setFono(administrador.getFono());
         administradorExistente.setArea(administrador.getArea());
-
-
-
+        
         String mensaje = administradorService.actualizarAdministrador(administradorExistente);
         return ResponseEntity.ok(mensaje);
     }
 
     @DeleteMapping("/eliminar/{rut}")
-    public ResponseEntity<String> eliminarAdministrador(@PathVariable String rut) {
+    @Operation(summary = "Eliminar administrador", description = "Elimina al administrador cuyo RUT coincida con el proporcionado.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Administrador eliminado exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Administrador no encontrado")
+    })
+    public ResponseEntity<String> eliminarAdministrador(
+        @Parameter(description = "RUT del administrador a eliminar", required = true)
+        @PathVariable String rut) {
+
         Administrador administradorExistente = administradorService.buscarPorRut(rut);
         if (administradorExistente == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -126,7 +180,16 @@ public class AdministradorController {
     }
 
     @GetMapping("/buscar/rut/{rut}")
-    public ResponseEntity<Administrador> buscarPorRut(@PathVariable String rut) {
+    @Operation(summary = "Buscar administrador por RUT", description = "Retorna la información de un administrador según su RUT.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Administrador encontrado",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Administrador.class))),
+        @ApiResponse(responseCode = "404", description = "Administrador no encontrado", content = @Content)
+    })
+    public ResponseEntity<Administrador> buscarPorRut(
+        @Parameter(description = "RUT del administrador a buscar", required = true)
+        @PathVariable String rut) {
+
         Administrador administrador = administradorService.buscarPorRut(rut);
         if (administrador == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -135,16 +198,31 @@ public class AdministradorController {
     }
 
     @GetMapping("/buscar/nombre/{nombre}")
-    public ResponseEntity<List<Administrador>> buscarPorNombre(@PathVariable String nombre) {
+    @Operation(summary = "Buscar administradores por nombre", description = "Busca y retorna una lista de administradores con el nombre especificado.")
+    @ApiResponse(responseCode = "200", description = "Lista de administradores encontrada",
+        content = @Content(mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = Administrador.class))))
+    public ResponseEntity<List<Administrador>> buscarPorNombre(
+        @Parameter(description = "Nombre del administrador a buscar", required = true)
+        @PathVariable String nombre) {
+
         List<Administrador> administradores = administradorService.buscarPorNombre(nombre);
         return ResponseEntity.ok(administradores);
     }
 
     @GetMapping("/buscar/nombre-parcial/{nombre}")
-    public ResponseEntity<List<Administrador>> buscarPorNombreParcial(@PathVariable String nombre) {
+    @Operation(summary = "Buscar administradores por nombre parcial", description = "Busca administradores cuyo nombre contenga la cadena proporcionada.")
+    @ApiResponse(responseCode = "200", description = "Lista de administradores encontrada",
+        content = @Content(mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = Administrador.class))))
+    public ResponseEntity<List<Administrador>> buscarPorNombreParcial(
+        @Parameter(description = "Parte del nombre del administrador a buscar", required = true)
+        @PathVariable String nombre) {
+
         List<Administrador> administradores = administradorService.buscarPorNombreParcial(nombre);
         return ResponseEntity.ok(administradores);
     }
 }
+
 
 

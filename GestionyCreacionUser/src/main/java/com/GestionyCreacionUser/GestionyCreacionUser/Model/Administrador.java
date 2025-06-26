@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 public class Administrador {
 
     @Id
-    @Column(unique = true, length = 13)
-    private String rut;
+    @Column(name = "rut_administrador", unique = true, length = 13)
+    private String rutAdministrador;
 
     @Column(nullable = false, length = 50,unique = false)
     private String nombre;

@@ -23,7 +23,7 @@ public class MedicoService {
 
     public String guardarMedico(Medico medico) {
         medicoRepository.save(medico);
-        return "Médico " + medico.getRut() + " guardado con éxito";
+        return "Médico " + medico.getRutMedico() + " guardado con éxito";
     }
 
     public String guardarMedicos(List<Medico> medicos) {
@@ -33,7 +33,7 @@ public class MedicoService {
 
     public String actualizarMedico(Medico medico) {
         medicoRepository.save(medico);
-        return "Médico " + medico.getRut() + " actualizado con éxito";
+        return "Médico " + medico.getRutMedico() + " actualizado con éxito";
     }
 
     public String eliminarMedico(String rut) {

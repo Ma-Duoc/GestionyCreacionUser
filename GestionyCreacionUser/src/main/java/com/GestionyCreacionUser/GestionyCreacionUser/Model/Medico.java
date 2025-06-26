@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 public class Medico {
 
     @Id
-    @Column(unique = true, length = 13)
-    private String rut;
+    @Column(name = "rut_medico", unique = true, length = 13)
+    private String rutMedico;
 
     @Column(nullable = false, length = 50,unique = false)
     private String nombre;

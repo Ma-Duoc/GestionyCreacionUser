@@ -23,7 +23,7 @@ public class AdministradorService {
 
     public String guardarAdministrador(Administrador administrador) {
         administradorRepository.save(administrador);
-        return "Administrador " + administrador.getRut() + " guardado con éxito";
+        return "Administrador " + administrador.getRutAdministrador() + " guardado con éxito";
     }
 
     public String guardarAdministradores(List<Administrador> administradores) {
@@ -33,7 +33,7 @@ public class AdministradorService {
 
     public String actualizarAdministrador(Administrador administrador) {
         administradorRepository.save(administrador);
-        return "Administrador " + administrador.getRut() + " actualizado con éxito";
+        return "Administrador " + administrador.getRutAdministrador() + " actualizado con éxito";
     }
 
     public String eliminarAdministrador(String rut) {

@@ -41,7 +41,7 @@ public class PacienteControllerTest {
     @BeforeEach
     void setUp() {
         paciente = new Paciente();
-        paciente.setRut("12345678-9");
+        paciente.setRutPaciente("12345678-9");
         paciente.setNombre("Juan Pérez");
         paciente.setCorreo("juan@example.com");
         paciente.setFono("912345678");
@@ -55,7 +55,7 @@ public class PacienteControllerTest {
 
         mockMvc.perform(get("/pacientes/listar"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].rut").value("12345678-9"));
+                .andExpect(jsonPath("$[0].rutPaciente").value("12345678-9"));
     }
 
     @Test

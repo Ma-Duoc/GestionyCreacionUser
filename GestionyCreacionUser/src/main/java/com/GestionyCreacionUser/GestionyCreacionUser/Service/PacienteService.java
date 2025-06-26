@@ -23,7 +23,7 @@ public class PacienteService {
 
     public String guardarPaciente(Paciente paciente) {
         pacienteRepository.save(paciente);
-        return "Paciente " + paciente.getRut() + " guardado con éxito";
+        return "Paciente " + paciente.getRutPaciente() + " guardado con éxito";
     }
 
     public String guardarPacientes(List<Paciente> pacientes) {
@@ -33,7 +33,7 @@ public class PacienteService {
 
     public String actualizarPaciente(Paciente paciente) {
         pacienteRepository.save(paciente); 
-        return "Paciente "+paciente.getRut()+" actualizado con éxito";
+        return "Paciente "+paciente.getRutPaciente()+" actualizado con éxito";
     }
 
     public String eliminarPaciente(String rut) {

@@ -29,7 +29,7 @@ public class DataLoader implements CommandLineRunner {
 
         for (int i = 0; i < 5; i++) {
             Paciente paciente = new Paciente();
-            paciente.setRut(faker.idNumber().valid());
+            paciente.setRutPaciente(faker.idNumber().valid());
             paciente.setNombre(faker.name().fullName());
             paciente.setCorreo(faker.internet().emailAddress());
             paciente.setFono(String.valueOf(faker.number().numberBetween(900000000, 999999999)));
@@ -46,7 +46,7 @@ public class DataLoader implements CommandLineRunner {
 
         for (int i=0; i<5; i++) {
             Medico medico = new Medico();
-            medico.setRut(faker.idNumber().valid());
+            medico.setRutMedico(faker.idNumber().valid());
             medico.setNombre(faker.name().fullName());
             medico.setCorreo(faker.internet().emailAddress());
             medico.setFono(String.valueOf(faker.number().numberBetween(900000000, 999999999)));
@@ -63,7 +63,7 @@ public class DataLoader implements CommandLineRunner {
 
         for (int i=0; i<5; i++) {
             Administrador administrador= new Administrador();
-            administrador.setRut(faker.idNumber().valid());
+            administrador.setRutAdministrador(faker.idNumber().valid());
             administrador.setNombre(faker.name().fullName());
             administrador.setCorreo(faker.internet().emailAddress());
             administrador.setFono(String.valueOf((faker.number().numberBetween(900000000, 999999999))));
