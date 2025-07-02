@@ -16,23 +16,23 @@ public class Paciente {
 
     @Id
     @Column(name = "rut_paciente", unique = true, length = 13)
-    private String rutPaciente;  
+    private String rutPaciente;
 
     @Column(nullable = false, length = 50,unique = false)
-    private String nombre;  
+    private String nombre;
 
     @Column(nullable = false)
-    private String correo;  
+    private String correo;
 
     @Column(nullable = false, length = 9)
-    private String fono;  
+    private String fono;
 
-    @Column(nullable = false, columnDefinition = "TEXT")  
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String historialMedico;
 
     @ManyToOne
     @JoinColumn(name = "rol_id", nullable = false)
-    private Rol rol_id; 
+    private Rol rol_id;
 
 
 }

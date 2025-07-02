@@ -43,22 +43,15 @@ public class PacienteController {
 
 
     @PostMapping("/guardar")
-    @Operation(
-        summary = "Registrar nuevo paciente",
+    @Operation(summary = "Registrar nuevo paciente",
         description = "Registra un nuevo paciente en el sistema. Se deben enviar todos los datos requeridos del paciente en el cuerpo de la solicitud."
     )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Paciente creado correctamente"),
+    @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Paciente creado correctamente"),
         @ApiResponse(responseCode = "400", description = "Campos requeridos faltantes o RUT repetido")
     })
-    public ResponseEntity<String> guardarPaciente(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Paciente a crear",
-            required = true,
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = Paciente.class)
-            )
+    public ResponseEntity<String> guardarPaciente(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Paciente a crear",required = true,content = @Content(
+                mediaType = "application/json",schema = @Schema(implementation = Paciente.class))
         )
         @RequestBody Paciente paciente) {
 
@@ -86,24 +79,16 @@ public class PacienteController {
 
 
     @PostMapping("/guardar-multiple")
-    @Operation(
-        summary = "Registrar múltiples pacientes",
+    @Operation(summary = "Registrar múltiples pacientes",
         description = "Permite registrar múltiples pacientes en una sola solicitud. Se envía un arreglo JSON con los datos de cada paciente."
     )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Lista de pacientes creada correctamente"),
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lista de pacientes creada correctamente"),
         @ApiResponse(responseCode = "400", description = "Algún paciente tiene datos inválidos o uno o más RUT ya existen")
     })
-    public ResponseEntity<String> guardarPacientes(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Lista de pacientes a crear",
-            required = true,
-            content = @Content(
-                mediaType = "application/json",
-                array = @ArraySchema(schema = @Schema(implementation = Paciente.class))
-            )
-        )
-        @RequestBody List<Paciente> pacientes) {
+    public ResponseEntity<String> guardarPacientes(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Lista de pacientes a crear",required = true,content = @Content(
+                mediaType = "application/json",array = @ArraySchema(schema = @Schema(implementation = Paciente.class)))
+        )@RequestBody List<Paciente> pacientes) {
 
         if (pacientes.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La lista de pacientes está vacía.");
@@ -120,14 +105,12 @@ public class PacienteController {
 
             Paciente pacienteExistente = pacienteService.buscarPorRut(paciente.getRutPaciente());
             if (pacienteExistente != null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Ya existe un paciente con el RUT " + paciente.getRutPaciente());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ya existe un paciente con el RUT " + paciente.getRutPaciente());
             }
             Rol rolPorDefecto = new Rol();
             rolPorDefecto.setRol_id(1);
             paciente.setRol_id(rolPorDefecto);
         }
-
         String mensaje = pacienteService.guardarPacientes(pacientes);
         return ResponseEntity.status(HttpStatus.CREATED).body(mensaje);
     }
@@ -143,14 +126,9 @@ public class PacienteController {
         @ApiResponse(responseCode = "400", description = "Datos inválidos o faltantes"),
         @ApiResponse(responseCode = "404", description = "Paciente no encontrado")
     })
-    public ResponseEntity<String> actualizarPaciente(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Paciente con datos actualizados",
-            required = true,
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = Paciente.class)
-            )
+    public ResponseEntity<String> actualizarPaciente(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Paciente con datos actualizados",required = true,
+            content = @Content(mediaType = "application/json",schema = @Schema(implementation = Paciente.class))
         )
         @RequestBody Paciente paciente) {
 
@@ -189,8 +167,7 @@ public class PacienteController {
 
         Paciente pacienteExistente = pacienteService.buscarPorRut(rut);
         if (pacienteExistente == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Paciente con RUT " + rut + " no encontrado.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente con RUT " + rut + " no encontrado.");
         }
 
         String mensaje = pacienteService.eliminarPaciente(rut);
@@ -204,9 +181,9 @@ public class PacienteController {
         description = "Retorna la información de un paciente específico según su RUT."
     )
     @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Paciente encontrado",
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = Paciente.class))),
-    @ApiResponse(responseCode = "404", description = "Paciente no encontrado", content = @Content)
+        @ApiResponse(responseCode = "200", description = "Paciente encontrado",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Paciente.class))),
+        @ApiResponse(responseCode = "404", description = "Paciente no encontrado", content = @Content)
     })
     public ResponseEntity<Paciente> buscarPorRut(
         @Parameter(description = "RUT del paciente a buscar", required = true)
@@ -226,7 +203,7 @@ public class PacienteController {
         description = "Busca y retorna una lista de pacientes cuyo nombre coincida con el valor entregado."
     )
     @ApiResponse(responseCode = "200", description = "Lista de pacientes encontrada (puede estar vacía)",
-        content = @Content(mediaType = "application/json",
+            content = @Content(mediaType = "application/json",
             array = @ArraySchema(schema = @Schema(implementation = Paciente.class))))
     public ResponseEntity<List<Paciente>> buscarPorNombre(
         @Parameter(description = "Nombre del paciente a buscar", required = true)
@@ -243,7 +220,7 @@ public class PacienteController {
         description = "Busca pacientes cuyo nombre contenga la cadena proporcionada. Útil para búsquedas parciales."
     )
     @ApiResponse(responseCode = "200", description = "Lista de pacientes encontrada (puede estar vacía)",
-        content = @Content(mediaType = "application/json",
+            content = @Content(mediaType = "application/json",
             array = @ArraySchema(schema = @Schema(implementation = Paciente.class))))
     public ResponseEntity<List<Paciente>> buscarPorNombreParcial(
         @Parameter(description = "Parte del nombre del paciente a buscar", required = true)

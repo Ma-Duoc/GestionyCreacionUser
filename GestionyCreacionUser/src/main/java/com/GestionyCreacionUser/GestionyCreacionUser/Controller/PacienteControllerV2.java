@@ -39,7 +39,7 @@ public class PacienteControllerV2 {
             schema = @Schema(implementation = CollectionModel.class)
         )
     )
-    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/listar",produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<CollectionModel<EntityModel<Paciente>>> listarPacientes() {
         List<Paciente> pacientes = pacienteService.listarPacientes();
         List<EntityModel<Paciente>> pacientesModel = pacientes.stream()
